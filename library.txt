@@ -1,0 +1,4 @@
+Firebase ESP32 by mobizt
+Adafruit MPU6050 by Adafruit
+Max30100_milan by Oxullo 
+TinyGPSPlus by mikal hart
