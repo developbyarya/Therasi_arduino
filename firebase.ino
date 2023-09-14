@@ -53,16 +53,14 @@ void setup() {
   // wifi stuff
   WiFi.mode(WIFI_STA); //Optional
   WiFi.begin(ssid, password);
-  Serial.println("\nConnecting");
+  Serial.println(F("\nConnecting"));
 
   while(WiFi.status() != WL_CONNECTED){
-      Serial.print(".");
+      Serial.print(F("."));
       delay(100);
   }
 
-  Serial.println("\nConnected to the WiFi network");
-  Serial.print("Local ESP32 IP: ");
-  Serial.println(WiFi.localIP());
+  Serial.println(F("\nConnected to the WiFi network"));
 
   // MPU
 
@@ -73,7 +71,7 @@ void setup() {
   mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
   
 
-  Serial.print("Initializing pulse oximeter..");
+  Serial.print(F("Initializing pulse oximeter.."));
 
     // Initialize the PulseOximeter instance
     // Failures are generally due to an improper I2C wiring, missing power supply
@@ -145,26 +143,26 @@ void loop(){
 
   /* Print out the values */
   
-  uint8_t x = (a.acceleration.x);
-  uint8_t y = (a.acceleration.y);
-  uint8_t z = (a.acceleration.z);
+  // uint8_t x = (a.acceleration.x);
+  // uint8_t y = (a.acceleration.y);
+  // uint8_t z = (a.acceleration.z);
 
-  uint8_t temp_res = (temp.temperature);
+  // uint8_t temp_res = (temp.temperature);
 
   pox.update();
 
     // Asynchronously dump heart rate and oxidation levels to the serial
     // For both, a value of 0 means "invalid"
-  float heart_rate;
-  int sp02;
+  // float heart_rate;
+  // int sp02;
 
-  if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
+  // if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
       
-      heart_rate =  (pox.getHeartRate());
-      sp02 = (pox.getSpO2());
+  //     heart_rate =  (pox.getHeartRate());
+  //     sp02 = (pox.getSpO2());
 
-      tsLastReport = millis();
-  }
+  //     tsLastReport = millis();
+  // }
   
   if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)){
     sendDataPrevMillis = millis();
@@ -192,28 +190,28 @@ void loop(){
       Serial.println("FAILED, GPS time");
       Serial.println("REASON: " + fbdo.errorReason());
     }
-    if (x && Firebase.RTDB.setInt(&fbdo, "acl/x", x))
+    if (a.acceleration.x && Firebase.RTDB.setInt(&fbdo, "acl/x", a.acceleration.x))
       {
         Serial.println("MPU BERHASIL, x");
       }else {
       Serial.println("FAILED, MPU X");
       Serial.println("REASON: " + fbdo.errorReason());
     }
-    if (y && Firebase.RTDB.setInt(&fbdo, "acl/y", y))
+    if (a.acceleration.y && Firebase.RTDB.setInt(&fbdo, "acl/y", a.acceleration.y))
       {
         Serial.println("MPU BERHASIL, y");
       }else {
       Serial.println("FAILED. MPU Y");
       Serial.println("REASON: " + fbdo.errorReason());
     }
-    if (z && Firebase.RTDB.setInt(&fbdo, "acl/z", z))
+    if (a.acceleration.z && Firebase.RTDB.setInt(&fbdo, "acl/z", a.acceleration.z))
       {
         Serial.println("MPU BERHASIL,z ");
       }else {
       Serial.println("FAILED, MPU Z");
       Serial.println("REASON: " + fbdo.errorReason());
     }
-    if (temp_res && Firebase.RTDB.setInt(&fbdo, "acl/temp", temp_res))
+    if (temp.temperature && Firebase.RTDB.setInt(&fbdo, "acl/temp", temp.temperature))
       {
         Serial.println("MPU BERHASIL, temp");
         Serial.println(x);
@@ -222,7 +220,7 @@ void loop(){
       Serial.println("REASON: " + fbdo.errorReason());
     }
 
-    if (heart_rate && Firebase.RTDB.setFloat(&fbdo, "pulse_oxi/heart-rate", heart_rate))
+    if (pox.getHeartRate() && Firebase.RTDB.setFloat(&fbdo, "pulse_oxi/heart-rate", pox.getHeartRate()))
       {
         Serial.println("MAX AMAN! herat rate");
       }else {
@@ -230,7 +228,7 @@ void loop(){
       Serial.println("REASON: " + fbdo.errorReason());
     }
     
-    if (sp02 && Firebase.RTDB.setInt(&fbdo, "pulse_oxi/sp02", sp02))
+    if (pox.getSpO2() && Firebase.RTDB.setInt(&fbdo, "pulse_oxi/sp02", pox.getSpO2()))
       {
         Serial.println("MAX SpO2");
         Serial.println(x);
